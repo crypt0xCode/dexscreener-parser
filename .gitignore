@@ -3,3 +3,4 @@
 /.venv/
 /tokens.json
 /logs.txt
+/tokens-info
