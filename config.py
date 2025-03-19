@@ -1,16 +1,15 @@
 import fake_useragent
-import logging
-from logging import FileHandler, Formatter
+from loguru import logger
 '''
 Config file for DEX Screener parser.
 '''
-# TODO: Write code for automatically creation ./tokens-info folder and clear it after 1 full parsing period.
 
 
 #region Constants.
 ALL_TOKENS_FILE_PATH: str = './tokens.json'
 TOKENS_INFO_FOLDER_FILE_PATH: str = './tokens-info/'
-LOGS_PATH: str = './logs.txt'
+LATENCY: int = 60 # change this constant for faster or slower API GET requests
+LOGS_PATH: str = './logs.log'
 LOGO: str = '''
 
                                                                                                                                                                                                  dddddddd                    
@@ -42,8 +41,14 @@ c:::::::cccccc:::::c r:::::r                 y:::::::y         p:::::ppppp::::::
 '''
 #endregion
 
+#region Loguru config.
+logger.add(
+    LOGS_PATH,
+    level='DEBUG'
+)
+#endregion
 
-# region Request config.
+#region Request config.
 token_boosts_url: str = 'https://api.dexscreener.com/token-boosts/latest/v1'  # get latest boosts tokens
 
 token_address: str = ''
@@ -54,28 +59,28 @@ headers = {
     'user-agent': user_agent
 }
 proxies = dict()
+#endregion
 
 
 def set_token_address(address: str = '') -> None:
+    """
+    Set specify token address.
+    :param address: token address.
+    :return: None.
+    """
     global token_address
     token_address = address
     update_token_info_url()
 
 
 def update_token_info_url() -> None:
+    """
+    Update token info API request.
+    :return: None.
+    """
     global token_info_url
     token_info_url = f'https://api.dexscreener.com/latest/dex/tokens/{token_address}'
-# endregion
 
-
-#region Logger config.
-logger: logging.Logger = logging.getLogger(__name__)
-logger.setLevel(logging.DEBUG)
-
-handler = FileHandler(filename=LOGS_PATH)
-handler.setFormatter(Formatter(fmt='[%(asctime)s: %(levelname)s] %(message)s'))
-logger.addHandler(handler)
-#endregion
 
 #region Tokens .json config.
 fp_token_name: str = ''
@@ -83,6 +88,11 @@ current_token_file_path: str = f'{fp_token_name}.json'
 
 
 def set_token_name(name: str = '') -> None:
+    """
+    Set specify token name for JSON data.
+    :param name: token name.
+    :return: None.
+    """
     global fp_token_name
     if '/' in name:
         name = name.replace('/', '_')
@@ -91,6 +101,10 @@ def set_token_name(name: str = '') -> None:
 
 
 def update_current_token_file_path() -> None:
+    """
+    Update filepath for current token JSON data.
+    :return: None.
+    """
     global current_token_file_path
     current_token_file_path= f'{fp_token_name}.json'
 #endregion
